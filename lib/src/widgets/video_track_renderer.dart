@@ -51,7 +51,7 @@ class VideoTrackRenderer extends StatefulWidget {
     this.track, {
     this.fit = rtc.RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
     this.mirrorMode = VideoViewMirrorMode.auto,
-    this.renderMode = VideoRenderMode.auto,
+    this.renderMode = VideoRenderMode.texture,
     Key? key,
   }) : super(key: key);
 
@@ -212,6 +212,11 @@ class _VideoTrackRendererState extends State<VideoTrackRenderer> {
     if (widget.mirrorMode == VideoViewMirrorMode.auto) {
       final track = widget.track;
       if (track is LocalVideoTrack) {
+        final settings = track.mediaStreamTrack.getSettings();
+        final facingMode = settings['facingMode'];
+        if (facingMode != null) {
+          return facingMode == 'user';
+        }
         final options = track.currentOptions;
         if (options is CameraCaptureOptions) {
           // mirror if front camera
